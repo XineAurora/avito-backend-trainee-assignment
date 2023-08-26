@@ -60,7 +60,7 @@ paths:
     get:
       description: "Get active user's segments"
       tags:
-        - Segments
+        - User's segments
       operationId: getActiveUserSegments
       parameters: 
         - name: user_id
@@ -84,7 +84,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    put:
+      description: "Update list of user's segments"
+      tags:
+        - User's segments
+      operationId: updateActiveUserSegments
+      parameters: 
+        - name: user_id
+          in: path
+          required: true
+          description: "User's ID"
+          schema: 
+            type: integer
+      requestBody:
+        description: "Contains segment slugs to include and exclude user from"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                include:
+                  type: array
+                  items: 
+                    type: string
+                  example: ["AVITO_VOICE_MESSAGES"]
+                exclude:
+                  type: array
+                  items: 
+                    type: string
+                  example: ["AVITO_DISCOUNT_30"]
               
+      responses:
+        '200':
+          description: "List of active segments of selected user"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Segment'
+        '400':
+          description: "Selected user don't participate in one of `exclude` segments or one of `include` segments don't exists"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        default:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    
 components:
   schemas:
     Segment:

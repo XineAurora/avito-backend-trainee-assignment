@@ -3,8 +3,15 @@ package models
 import "gorm.io/gorm"
 
 type UserSegment struct {
-	gorm.Model
-	UserId    int     `gorm:"not null"`
-	SegmentId int     `gorm:"not null,constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Segment   Segment `json:"-"`
+	UserId    int     `gorm:"primaryKey;not null;autoIncrement:false;"`
+	SegmentId int     `gorm:"primaryKey;not null;autoIncrement:false;"`
+	Segment   Segment `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+}
+
+func GetUserActiveSegments(db *gorm.DB) ([]UserSegment, error) {
+	return nil, nil
+}
+
+func UpdateUserActiveSegments(db *gorm.DB, include []string, exclude []string) error {
+	return nil
 }
