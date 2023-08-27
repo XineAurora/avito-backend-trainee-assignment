@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+
 	"gorm.io/gorm"
 )
 
@@ -26,16 +28,33 @@ func UpdateUserActiveSegments(db *gorm.DB, userId int, include []string, exclude
 		return err
 	}
 
-	//TODO: if there is no user segment to delete should return error
-	// DELETE FROM user_segments WHERE user_id=$userId AND segment_id IN (SELECT id FROM segments WHERE name IN ($segmentNames));
-	tx.Where("user_id=? AND segment_id IN (?)", userId, tx.Model(&Segment{}).Select("id").Where("name IN (?)", exclude)).Delete(&UserSegment{})
-	if err := tx.Error; err != nil {
-		tx.Rollback()
-		return err
+	for _, segmentName := range exclude {
+		var segment Segment
+		if err := tx.Where("name=?", segmentName).First(&segment).Error; err != nil {
+			tx.Rollback()
+			return errors.New("one of `exclude` segments doesn't exist")
+		}
+		userSegment := UserSegment{UserId: userId, Segment: segment}
+		if err := tx.Where("user_id=? AND segment_id=?", userId, segment.ID).First(&userSegment).Error; err != nil {
+			tx.Rollback()
+			return errors.New("user don't participate in one of `exclude` segments")
+		} else {
+			tx.Delete(&userSegment)
+		}
 	}
 
-	//TODO: create new rows in database
-	// tx.Create()
+	for _, segmentName := range include {
+		var segment Segment
+		if err := tx.Where("name=?", segmentName).First(&segment).Error; err != nil {
+			tx.Rollback()
+			return errors.New("one of `include` segments doesn't exist")
+		}
+		userSegment := UserSegment{UserId: userId, Segment: segment}
+		if err := tx.Create(&userSegment).Error; err != nil {
+			tx.Rollback()
+			return errors.New("user already participate in one of `include` segments")
+		}
+	}
 
 	return tx.Commit().Error
 }
