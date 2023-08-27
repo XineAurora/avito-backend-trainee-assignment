@@ -6,6 +6,11 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	segmentNameParam = "segment_slug"
+	userIdParam      = "user_id"
+)
+
 type Handler struct {
 	Router *gin.Engine
 	DB     *gorm.DB
@@ -24,13 +29,13 @@ func New() (*Handler, error) {
 	{
 		segments := v1.Group("/segments")
 		{
-			segments.POST("/:segment_slug", handler.CreateSegment)
-			segments.DELETE("/:segment_slug", handler.DeleteSegment)
+			segments.POST("/:"+segmentNameParam, handler.CreateSegment)
+			segments.DELETE("/:"+segmentNameParam, handler.DeleteSegment)
 
 			userOperations := segments.Group("/users")
 			{
-				userOperations.GET("/:user_id", handler.GetUserActiveSegments)
-				userOperations.POST("/:user_id", handler.UpdateUserActiveSegments)
+				userOperations.GET("/:"+userIdParam, handler.GetUserActiveSegments)
+				userOperations.POST("/:"+userIdParam, handler.UpdateUserActiveSegments)
 			}
 		}
 	}
