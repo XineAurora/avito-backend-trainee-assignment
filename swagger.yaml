@@ -125,7 +125,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Segment'
         '400':
-          description: "Selected user don't participate in one of `exclude` segments or one of `include` segments don't exists"
+          description: "Selected user don't participate in one of `exclude` segments or one of `include` segments don't exists or user already participate in one of `include` segments"
           content:
             application/json:
               schema:
@@ -145,7 +145,7 @@ components:
       required: 
         - name
       properties:
-        segment_id:
+        id:
           type: integer
           example: 24
         name:

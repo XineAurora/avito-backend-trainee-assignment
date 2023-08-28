@@ -1,7 +1,6 @@
 package apihandler
 
 import (
-	"github.com/XineAurora/user-segmentation/internal/db"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -16,13 +15,7 @@ type Handler struct {
 	DB     *gorm.DB
 }
 
-func New() (*Handler, error) {
-	router := gin.Default()
-	db, err := db.New()
-	if err != nil {
-		//TODO: add description to error
-		return nil, err
-	}
+func New(router *gin.Engine, db *gorm.DB) (*Handler, error) {
 	handler := &Handler{Router: router, DB: db}
 
 	v1 := router.Group("/api/v1")
@@ -41,4 +34,11 @@ func New() (*Handler, error) {
 	}
 
 	return handler, nil
+}
+
+func (h *Handler) Start() error {
+	if err := h.Router.Run(); err != nil {
+		return err
+	}
+	return nil
 }
