@@ -28,7 +28,7 @@ func New(router *gin.Engine, db *gorm.DB) (*Handler, error) {
 			userOperations := segments.Group("/users")
 			{
 				userOperations.GET("/:"+userIdParam, handler.GetUserActiveSegments)
-				userOperations.POST("/:"+userIdParam, handler.UpdateUserActiveSegments)
+				userOperations.PUT("/:"+userIdParam, handler.UpdateUserActiveSegments)
 			}
 		}
 	}

@@ -1,6 +1,8 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Segment struct {
 	gorm.Model
@@ -9,13 +11,28 @@ type Segment struct {
 
 func CreateSegment(db *gorm.DB, name string) (*Segment, error) {
 	segment := Segment{Name: name}
-	if tx := db.Create(&segment); tx.Error != nil {
-		return nil, tx.Error
+	// if segment was deleted before, restore it
+	if err := db.Unscoped().Where("name=?", name).First(&segment).Error; err == nil && segment.DeletedAt.Valid {
+		err = db.Unscoped().Model(&segment).Update("deleted_at", nil).Error
+		if err != nil {
+			return nil, err
+		}
+		return &segment, nil
+	}
+	//
+	if err := db.Create(&segment).Error; err != nil {
+		return nil, err
 	}
 	return &segment, nil
 }
 
 func DeleteSegment(db *gorm.DB, name string) error {
-	tx := db.Where("name=?", name).Delete(&Segment{})
-	return tx.Error
+	var segment Segment
+	if err := db.Where("name=?", name).First(&segment).Error; err != nil {
+		return err
+	}
+	if err := db.Delete(&segment).Error; err != nil {
+		return err
+	}
+	return nil
 }
