@@ -12,10 +12,10 @@ type UserSegment struct {
 	Segment   Segment `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
-func GetUserActiveSegments(db *gorm.DB, userId int) ([]string, error) {
-	userSegments := []string{}
-	// SELECT segments.name FROM user_segments JOIN segments ON (segment_id=segments.id) WHERE user_id=$userid;
-	tx := db.Model(&UserSegment{}).Select("segments.name").Joins("JOIN segments ON (segment_id=segments.id)").Where("user_id=?", userId).Find(&userSegments)
+func GetUserActiveSegments(db *gorm.DB, userId int) ([]Segment, error) {
+	userSegments := []Segment{}
+	// SELECT segments.id, segments.name FROM user_segments JOIN segments ON (segment_id=segments.id) WHERE user_id=$userid;
+	tx := db.Model(&UserSegment{}).Select("segments.id, segments.name").Joins("JOIN segments ON (segment_id=segments.id)").Where("user_id=?", userId).Find(&userSegments)
 	if err := tx.Error; err != nil {
 		return nil, err
 	}
