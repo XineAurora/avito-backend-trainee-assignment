@@ -65,3 +65,8 @@ func (h *Handler) UpdateUserActiveSegments(c *gin.Context) {
 	}
 	c.Status(http.StatusOK)
 }
+
+func (h *Handler) VerifyUserId(c *gin.Context) {
+	//verify userid or discard request
+	c.Next()
+}
