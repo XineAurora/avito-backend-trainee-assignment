@@ -22,3 +22,6 @@ go.work
 
 # Enviroment variables file
 *.env
+
+# Database volumes
+database/postgres/.data
